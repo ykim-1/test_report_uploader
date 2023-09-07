@@ -8,6 +8,19 @@ from api_interaction import upload_encoded_xml_file
 from setup_configuration import check_and_install_linode_cli
 
 
+def get_software_name(file_name: str):
+    if 'cli' in file_name:
+        return "linode-cli"
+    elif 'sdk' in file_name:
+        return "linode_api4"
+    elif 'linodego' in file_name:
+        return "linodego"
+    elif 'terraform' in file_name:
+        return "linode-terraform"
+    else:
+        "unknown software type"
+
+
 # Download all xml test reports
 def download_and_upload_xml_files(cluster, bucket, url):
     list_process = execute_command(get_list_command(cluster))
@@ -17,7 +30,6 @@ def download_and_upload_xml_files(cluster, bucket, url):
     xml_files = []
 
     team_name = os.environ.get('TEAM_NAME')
-    software_name = os.environ.get('SOFTWARE_NAME')
     build_name = os.environ.get('BUILD_NAME')
     version = os.environ.get('VERSION')
 
@@ -38,7 +50,7 @@ def download_and_upload_xml_files(cluster, bucket, url):
         # Define the data as a dictionary
         data = {
             "team": team_name,
-            "softwareName": software_name,
+            "softwareName": get_software_name(file_name=file),
             "buildName": build_name,
             "semanticVersion": version,
             "pass": True,

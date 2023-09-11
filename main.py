@@ -30,8 +30,6 @@ def download_and_upload_xml_files(cluster, bucket, url):
     xml_files = []
 
     team_name = os.environ.get('TEAM_NAME')
-    build_name = os.environ.get('BUILD_NAME')
-    version = os.environ.get('VERSION')
 
     for line in lines_of_all_files:
         if bucket in line and line.endswith(".xml"):
@@ -51,9 +49,6 @@ def download_and_upload_xml_files(cluster, bucket, url):
         data = {
             "team": team_name,
             "softwareName": get_software_name(file_name=file),
-            "buildName": build_name,
-            "semanticVersion": version,
-            "pass": True,
             "xunitResults": [encoded_file]
         }
 

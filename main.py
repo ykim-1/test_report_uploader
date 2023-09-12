@@ -1,10 +1,12 @@
 import base64
 import os
 import json
+import xml.etree.ElementTree as ET
+
 
 from linode_commands import get_list_command, get_download_command, get_remove_command
 from command_execution import execute_command
-from api_interaction import upload_encoded_xml_file
+from api_interaction import upload_encoded_xml_file, get_release_version
 from setup_configuration import check_and_install_linode_cli
 
 
@@ -38,6 +40,23 @@ def download_and_upload_xml_files(cluster, bucket, url):
 
     # Upload each xml file to TOD
     for file in xml_files:
+        # Parse the XML file
+        tree = ET.parse(file)
+        root = tree.getroot()
+        branch_name_element = root.find('branch_name')
+        gha_run_id_element = root.find('gha_run_id')
+        gha_run_number_element = root.find('gha_run_number')
+
+        branch_name_value = branch_name_element.text if branch_name_element is not None else None
+
+        gha_id_value = gha_run_id_element.text if gha_run_id_element is not None else None
+
+        gha_number_value = gha_run_number_element.text if gha_run_number_element is not None else None
+
+        latest_release_url = "https://api.github.com/repos/linode/linode-cli/releases/latest"
+
+        release_version = get_release_version(latest_release_url)
+
         result = execute_command(get_download_command(cluster, bucket, file))
 
         # if above command was successful encode the xml file for upload
@@ -49,7 +68,12 @@ def download_and_upload_xml_files(cluster, bucket, url):
         data = {
             "team": team_name,
             "softwareName": get_software_name(file_name=file),
-            "xunitResults": [encoded_file]
+            "buildName": "GHA_ID/RUN#:" + gha_id_value + "/" + gha_number_value,
+            # Change semantic version current release (e.g. 5.48.1)
+            "semanticVersion": release_version,
+            "pass": True,
+            "xunitResults": [encoded_file],
+            "tag": branch_name_value
         }
 
         headers = {"Content-Type": "application/json"}
@@ -62,14 +86,15 @@ def download_and_upload_xml_files(cluster, bucket, url):
         if response.status_code == 201:
             print(f"{file} uploaded successful...")
 
-            # delete the xml files from the object storage
-            result = execute_command(get_remove_command(cluster, bucket, file))
-
-            if result.returncode == 0:
-                print(f"{file} deleted from object storage...")
+            # Keeping the report file in the storage for now.
+            # # delete the xml files from the object storage
+            # result = execute_command(get_remove_command(cluster, bucket, file))
+            #
+            # if result.returncode == 0:
+            #     print(f"{file} deleted from object storage...")
 
         else:
-            print(f"POST request failed with status code: {response.status_code}")
+            print(f"POST request for file {file} failed with status code: {response.status_code}")
             print(response.text)
 
 

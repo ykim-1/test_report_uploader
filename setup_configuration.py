@@ -3,10 +3,11 @@ import subprocess
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
+
 
 def check_and_install_linode_cli():
     # Load environment variables from .env file
-    load_dotenv()
 
     required_env_vars = ["LINODE_CLI_TOKEN", "LINODE_CLI_OBJ_ACCESS_KEY", "LINODE_CLI_OBJ_SECRET_KEY"]
 

@@ -40,6 +40,8 @@ def download_and_upload_xml_files(cluster, bucket, url):
 
     # Upload each xml file to TOD
     for file in xml_files:
+        result = execute_command(get_download_command(cluster, bucket, file))
+
         # Parse the XML file
         tree = ET.parse(file)
         root = tree.getroot()
@@ -56,8 +58,6 @@ def download_and_upload_xml_files(cluster, bucket, url):
         latest_release_url = "https://api.github.com/repos/linode/linode-cli/releases/latest"
 
         release_version = get_release_version(latest_release_url)
-
-        result = execute_command(get_download_command(cluster, bucket, file))
 
         # if above command was successful encode the xml file for upload
         f = open(file, "r")

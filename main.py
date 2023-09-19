@@ -61,7 +61,7 @@ def download_and_upload_xml_files(cluster, bucket, url):
         f = open(file, "r")
         lines = f.read()
         encoded_file = str(base64.b64encode(lines.encode('utf-8')).decode('utf-8'))
-        
+
         # get softwarename
         software_name = get_software_name(file_name=file)
 
@@ -89,7 +89,7 @@ def download_and_upload_xml_files(cluster, bucket, url):
 
             # delete the xml files from the object storage because it will create a duplicate entry in TOD
             result = execute_command(get_remove_command(cluster, bucket, file))
-            
+
             if result.returncode == 0:
                 print(f"{file} deleted from object storage...")
 

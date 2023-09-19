@@ -19,6 +19,6 @@ def check_and_install_linode_cli():
         exit(1)
 
     try:
-        subprocess.run(["linode-cli", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        subprocess.run(["/usr/local/bin/linode-cli", "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
     except subprocess.CalledProcessError:
         print("linode-cli is not installed. Please make sure Linode CLI is installed...")

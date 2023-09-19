@@ -1,7 +1,20 @@
 import requests
 
+latest_release_urls = ["https://api.github.com/repos/linode/linode-cli/releases/latest", "https://api.github.com/repos/linode/linode_api4-python/releases/latest", "https://api.github.com/repos/linode/linodego/releases/latest", "https://api.github.com/repos/linode/terraform-provider-linode/releases/latest"]
 
-def get_release_version(url):
+def get_release_version(file_name):
+    url = ""
+    if 'cli' in file_name:
+        url = latest_release_urls[0]
+    elif 'sdk' in file_name:
+        url = latest_release_urls[1]
+    elif 'linodego' in file_name:
+        url = latest_release_urls[2]
+    elif 'terraform' in file_name:
+        url = latest_release_urls[3]
+    else:
+        "unknown log type"
+        
     try:
         response = requests.get(url)
         response.raise_for_status()  # Check for HTTP errors

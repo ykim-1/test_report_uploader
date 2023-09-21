@@ -70,12 +70,24 @@ def download_and_upload_xml_files(cluster, bucket, url):
             "team": team_name,
             "softwareName": software_name,
             "semanticVersion": release_version,
-            # Change semantic version current release (e.g. 5.48.1)
             "buildName": software_name + " " + release_version,
             "pass": True,
             "xunitResults": [encoded_file],
-            "tag": "branch: " + branch_name_value + " GHA_ID/RUN#:" + gha_id_value + "/" + gha_number_value
+            "tag": ""
         }
+
+        if branch_name_value is not None:
+            data["tag"] += "branch: " + branch_name_value
+
+        if gha_id_value is not None:
+            if data["tag"]:
+                data["tag"] += " "
+            data["tag"] += "GHA_ID/RUN#:" + gha_id_value
+
+        if gha_number_value is not None:
+            if data["tag"]:
+                data["tag"] += " "
+            data["tag"] += "/" + gha_number_value
 
         headers = {"Content-Type": "application/json"}
 
